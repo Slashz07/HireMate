@@ -37,7 +37,7 @@ const menuItems:MenuItems[]=[
      {
         label:"Interview Prep",
         icon:GraduationCap,
-        href:"/interviewPrep"
+        href:"/interview"
     },
 ]
 

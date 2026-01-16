@@ -5,6 +5,8 @@ import { ThemeProvider } from "@/components/ui/theme-provider";
 import Footer from "@/components/myComponents/Footer";
 import Header from "@/components/myComponents/Header";
 import { ClerkProvider } from '@clerk/nextjs'
+
+import { dark } from '@clerk/themes'
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
@@ -18,11 +20,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body
+    <ClerkProvider appearance={{
+      theme:dark
+      }}>
+      <html lang="en" suppressHydrationWarning>
+        <body
           className={`${inter.className}`}
-      >
-        <ClerkProvider>
+        >
           <ThemeProvider
             attribute="class"
             defaultTheme="dark"
@@ -33,8 +37,9 @@ export default function RootLayout({
             <main className="min-h-screen">{children}</main>
             <Footer />
           </ThemeProvider>
-        </ClerkProvider>
-      </body>
-    </html>
+        </body>
+      </html>
+    </ClerkProvider>
+
   );
 }
