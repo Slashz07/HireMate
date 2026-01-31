@@ -2,7 +2,7 @@ import { BrainCircuit, Briefcase, LineChart, LucideIcon, Scroll } from 'lucide-r
 import React from 'react'
 import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card'
 
-interface featureList{
+export interface featureList{
   logo:LucideIcon,
   title:string,
   content:string
@@ -36,7 +36,7 @@ function FeatureSection() {
       <h1 className='font-bold text-3xl mb-12 tracking-tighter'>
         Powerfull features for your growth
       </h1>
-      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 min-w-6xl'>
+      <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 '>
         {
           features.map((feature, idx) => (
             <Card key={idx} className='min-w-18 border-2 hover:border-primary transition-colors duration-300'>
