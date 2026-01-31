@@ -27,7 +27,7 @@ function HeroSection() {
     }, [])
 
     return (
-        <section className='w-full pt-36 md:pt-48 pb-10'>
+        <div className='px-2'>
             <div className='space-y-6 text-center mb-5'>
                 <div className='space-y-6'>
                     <h1 className='text-5xl font-bold md:text-6xl lg:text-7xl xl:text-8xl gradient-title '>
@@ -56,8 +56,7 @@ function HeroSection() {
                     <Image src={"/heroImg.png"} width={1280} height={720} alt='HIREMATE' className='rounded-lg shadow-2xl border mx-auto ' priority />
                 </div>
             </div>
-        </section>
-
+        </div>
     )
 }
 
