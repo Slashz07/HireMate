@@ -1,6 +1,6 @@
 import { BrainCircuit, Briefcase, LineChart, LucideIcon, Scroll } from 'lucide-react'
 import React from 'react'
-import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../ui/card'
+import { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../../ui/card'
 
 export interface featureList{
   logo:LucideIcon,
