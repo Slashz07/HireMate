@@ -3,6 +3,8 @@ import FeatureSection from "@/components/myComponents/(LandingPageComponents)/Fe
 import Figures from "@/components/myComponents/(LandingPageComponents)/Figures";
 import HeroSection from "@/components/myComponents/(LandingPageComponents)/HeroSection";
 import HowItWorks from "@/components/myComponents/(LandingPageComponents)/HowItWorks";
+import Questions from "@/components/myComponents/(LandingPageComponents)/Questions";
+import StartJourneyToday from "@/components/myComponents/(LandingPageComponents)/StartJourneyToday";
 import Testimonials from "@/components/myComponents/(LandingPageComponents)/Testimonials";
 
 export default function Home() {
@@ -23,6 +25,12 @@ export default function Home() {
       </section>
       <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
         <Testimonials/>
+      </section>
+      <section className="w-full py-12 md:py-24 lg:py-32 ">
+        <Questions/>
+      </section>
+      <section className="w-full">
+        <StartJourneyToday/>
       </section>
     </div>
   );
