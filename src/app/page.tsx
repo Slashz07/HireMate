@@ -1,8 +1,9 @@
 "use client"
-import FeatureSection from "@/components/myComponents/FeatureSection";
-import Figures from "@/components/myComponents/Figures";
-import HeroSection from "@/components/myComponents/HeroSection";
-import HowItWorks from "@/components/myComponents/HowItWorks";
+import FeatureSection from "@/components/myComponents/(LandingPageComponents)/FeatureSection";
+import Figures from "@/components/myComponents/(LandingPageComponents)/Figures";
+import HeroSection from "@/components/myComponents/(LandingPageComponents)/HeroSection";
+import HowItWorks from "@/components/myComponents/(LandingPageComponents)/HowItWorks";
+import Testimonials from "@/components/myComponents/(LandingPageComponents)/Testimonials";
 
 export default function Home() {
   return (
@@ -19,6 +20,9 @@ export default function Home() {
       </section>
       <section className="w-full py-12 md:py-24 lg:py-32 bg-background">
         <HowItWorks/>
+      </section>
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-muted">
+        <Testimonials/>
       </section>
     </div>
   );
