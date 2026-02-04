@@ -1,4 +1,3 @@
-"use client"
 export const dynamic = "force-dynamic";
 
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs'
@@ -7,7 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
 import { Button } from '../ui/button';
-
+import {CheckUser} from '@/lib/CheckUser'
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -41,7 +40,8 @@ const menuItems:MenuItems[]=[
     },
 ]
 
-const Header = () => {
+const Header = async () => {
+    await CheckUser()
     return (
         <nav className='flex justify-between fixed top-0 w-full bg-background/80 backdrop-blur-md z-50 supports-backdrop-filter:bg-background/60 border-b border-white/10'>
             <div className='flex gap-4 container px-4 h-25  items-center'>
