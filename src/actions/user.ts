@@ -1,10 +1,17 @@
+"use server"
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
-import { PrismaClient, User } from "@prisma/client";
 
-export const updateUser = async (data: User) => {
+interface formInfo {
+    industry: string,
+    subIndustry: string,
+    bio?: string,
+    experience: number,
+    skills: string[]
+}
+
+export const updateUser = async (data: formInfo) => {
     const { userId } = await auth()
-
     if (!userId) throw new Error("Unauthenticated Request")
 
     const user = await db.user.findUnique({
@@ -45,16 +52,24 @@ export const updateUser = async (data: User) => {
                     where: {
                         id: user.id
                     },
-                    data: { ...data }
+                    data: {
+                        industry: data.industry,
+                        bio: data.bio,
+                        experience: data.experience,
+                        skills: data.skills,
+                    }
                 })
                 return { updatedUser, industryInsghts }
             }, {
             timeout: 10000
         }
         )
+        return { success: true as const, ...result }
     } catch (error) {
         console.log("Error: ", error)
-        throw new Error("Error updating user data")
+        if (error instanceof Error) throw new Error("Error updating user data: " + error.message)
+
+        throw new Error("Error occurred updating user: ", error as any)
     }
 
 }
