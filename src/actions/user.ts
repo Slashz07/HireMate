@@ -1,6 +1,7 @@
 "use server"
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+import { aiIndustryInsight } from "./dashBoard";
 
 interface formInfo {
     industry: string,
@@ -8,6 +9,23 @@ interface formInfo {
     bio?: string,
     experience: number,
     skills: string[]
+}
+export type SalaryRange = {
+    role: string
+    min: number
+    max: number
+    median: number
+    location: string
+}
+
+export type IndustryInsightsResponse = {
+    salaryRanges: SalaryRange[]
+    growthRate: number
+    demandLevel: "HIGH" | "MEDIUM" | "LOW"
+    topSkills: string[]
+    marketOutlook: "POSITIVE" | "NEUTRAL" | "NEGATIVE"
+    keyTrends: string[]
+    recommendedSkills: string[]
 }
 
 export const updateUser = async (data: formInfo) => {
@@ -25,27 +43,26 @@ export const updateUser = async (data: formInfo) => {
 
     try {
         //since we are to make multiple api calls ,we create a transaction(provided by prisma) so that either all api calls are made succesfully or else nothing is executed at all to avoid half-done work 
+        let industryInsights = await db.industryInsights.findUnique({
+            where: {
+                industry: data.industry as string
+            }
+        })
+        let insights: IndustryInsightsResponse;
+        if (!industryInsights) {
+            insights = await aiIndustryInsight(data.industry as string)
+        }
         const result = await db.$transaction(
             async (tx) => {
-                let industryInsghts = await tx.industryInsights.findUnique({
-                    where: {
-                        industry: data.industry as string
-                    }
-                })
-                if (!industryInsghts) {
-                    industryInsghts = await tx.industryInsights.create({
+                if (!industryInsights) {
+                    const updateInsights = await tx.industryInsights.create({
                         data: {
                             industry: data.industry as string,
-                            salaryRanges: [],
-                            growthRate: 0,
-                            demandLevel: "MEDIUM",
-                            topSkills: [],
-                            marketOutlook: "NEUTRAL",
-                            keyTrends: [],
-                            recommendedSkills: [],
+                            ...insights,
                             nextUpdate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
                         }
                     })
+                    industryInsights = updateInsights
                 }
 
                 const updatedUser = await tx.user.update({
@@ -59,7 +76,7 @@ export const updateUser = async (data: formInfo) => {
                         skills: data.skills,
                     }
                 })
-                return { updatedUser, industryInsghts }
+                return { updatedUser, industryInsights }
             }, {
             timeout: 10000
         }
