@@ -13,7 +13,7 @@ interface formInfo{
   type UpdateUserFn = (data: formInfo) => Promise<{
   success: true
   updatedUser: User
-  industryInsghts: IndustryInsights
+  industryInsights: IndustryInsights
 }>
 
 
