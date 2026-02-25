@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import { SignedIn, SignedOut, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs'
-import { FileText, GraduationCap, LayoutDashboard, LucideIcon, PenBox, StarsIcon } from 'lucide-react'
+import { ChevronDown, FileText, GraduationCap, LayoutDashboard, LucideIcon, PenBox, StarsIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import React from 'react'
@@ -55,7 +55,7 @@ const Header = async () => {
                 </Link>
                 <div className='flex gap-2 md:space-x-4'>
                     <SignedIn>
-                        <Link href={'/industry_insights'}>
+                        <Link href={'/dashBoard'}>
 
                             <Button className=''>
                                 <LayoutDashboard className='h-4 w-4 mx-2' />
@@ -67,9 +67,10 @@ const Header = async () => {
                             <Button variant={'outline'}>
                                 <StarsIcon className='h-4 w-4 mx-2'/>
                                 <span className='hidden md:block px-1.5 '>Growth tools</span>
+                                <ChevronDown className='h-4 w-4'/>
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent>
+                        <DropdownMenuContent className="w-[var(--radix-dropdown-menu-trigger-width)]">
                             {
                                 menuItems.map((item,idx)=>{
                                     const Icon=item.icon
