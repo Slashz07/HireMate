@@ -8,7 +8,7 @@ const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 
 export const aiIndustryInsight = async (industry: string) => {
-        const prompt = `
+    const prompt = `
                 Analyze the current state of the ${industry} industry and provide insights in only the following JSON format without any additional notes or explanations:
                     {
                                 "salaryRanges": [
@@ -22,27 +22,28 @@ export const aiIndustryInsight = async (industry: string) => {
                                 "keyTrends": ["trend1","trend2"],
                                 "recommendedSkills": ["skill1","skill2"],
                     }
-                    IMPORTANT: Return ONLY the JSON.No additional text,notes,or markdown formatting.
+                    IMPORTANT: Return ONLY the JSON. No additional text, notes, or markdown formatting.
                     Include at least 5 common roles for salary ranges.
                     Growth rate should be a percentage.
                     Include at least 5 skills and trends.
+                    CRITICAL: Keep all skills in "topSkills" and "recommendedSkills" extremely concise. Use maximum 1-2 words per skill (e.g., use "AWS" instead of "Cloud Platforms (AWS)", use "Docker" instead of "Containerization").
                 `
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: prompt,
-        });
-    
-        if (!response.text) throw new Error("Error accessing data in Gemini api");
-    
-        const raw = response.text.trim();
-    
-        // Extract JSON block
-        const match = raw.match(/\{[\s\S]*\}/);//match here extracts everything enclosed in {} in the raw and returns it in an array of object
-        if (!match) throw new Error("No JSON found in gemini api response");
-    
-        // Parse after extracting
-        return JSON.parse(match[0]);
-        
+    const response = await ai.models.generateContent({ 
+        model: "gemini-2.5-flash",
+        contents: prompt,
+    });
+
+    if (!response.text) throw new Error("Error accessing data in Gemini api");
+
+    const raw = response.text.trim();
+
+    // Extract JSON block
+    const match = raw.match(/\{[\s\S]*\}/);//match here extracts everything enclosed in {} in the raw and returns it in an array of object
+    if (!match) throw new Error("No JSON found in gemini api response");
+
+    // Parse after extracting
+    return JSON.parse(match[0]);
+
 }
 
 export async function updateDashBoard() {
@@ -60,11 +61,11 @@ export async function updateDashBoard() {
     if (!user) {
         throw new Error("User not found")
     }
-    console.log("User data: ",user)
+    // console.log("User data: ",user)
     try {
         if (!user.industryInsight) {
-            const insights:IndustryInsightsResponse = await aiIndustryInsight(user.industry as string)
-            console.log("User insights: ",insights)
+            const insights: IndustryInsightsResponse = await aiIndustryInsight(user.industry as string)
+            console.log("User insights: ", insights)
             const updatedInsights = await db.industryInsights.create({
                 data: {
                     industry: user.industry as string,
@@ -77,7 +78,7 @@ export async function updateDashBoard() {
         return user.industryInsight
 
     } catch (error) {
-            console.log("Error dealing with gemini api: ",error as unknown)
-
+        console.log("Error dealing with gemini api: ", error as unknown)
+         throw new Error(`Error dealing with gemini api: ${error}`)
     }
 }
