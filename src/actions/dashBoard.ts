@@ -3,9 +3,7 @@ import { db } from "@/lib/prisma"
 import { auth } from "@clerk/nextjs/server"
 import { GoogleGenAI } from '@google/genai'
 import { IndustryInsightsResponse } from "./user";
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
+import { getGeminiResponse } from "@/lib/gemini";
 
 export const aiIndustryInsight = async (industry: string) => {
     const prompt = `
@@ -28,21 +26,9 @@ export const aiIndustryInsight = async (industry: string) => {
                     Include at least 5 skills and trends.
                     CRITICAL: Keep all skills in "topSkills" and "recommendedSkills" extremely concise. Use maximum 1-2 words per skill (e.g., use "AWS" instead of "Cloud Platforms (AWS)", use "Docker" instead of "Containerization").
                 `
-    const response = await ai.models.generateContent({ 
-        model: "gemini-2.5-flash",
-        contents: prompt,
-    });
 
-    if (!response.text) throw new Error("Error accessing data in Gemini api");
-
-    const raw = response.text.trim();
-
-    // Extract JSON block
-    const match = raw.match(/\{[\s\S]*\}/);//match here extracts everything enclosed in {} in the raw and returns it in an array of object
-    if (!match) throw new Error("No JSON found in gemini api response");
-
-    // Parse after extracting
-    return JSON.parse(match[0]);
+    const res=await getGeminiResponse(prompt)
+    return res
 
 }
 
