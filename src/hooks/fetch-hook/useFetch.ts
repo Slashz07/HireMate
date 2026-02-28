@@ -1,46 +1,44 @@
-import { IndustryInsights, User } from '@prisma/client'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { toast } from 'sonner'
 
-interface formInfo{
-    industry:string,
-    subIndustry:string,
-    bio?:string,
-    experience:number,
-    skills:string[]
-  }
+// We use TArgs (arguments) and TRes (response) as generic placeholders.
+// TArgs extends any[] allows the callback to take zero, one, or multiple arguments.
+function useFetch<TArgs extends any[], TRes>(cb: (...args: TArgs) => Promise<TRes>) {
+    const [loading, setLoading] = useState(false)
+    const [error, setError] = useState("")
+    
+    // Initialize as undefined instead of {} so TypeScript knows the data might not be there yet.
+    const [data, setData] = useState<TRes | null>(null)
 
-  type UpdateUserFn = (data: formInfo) => Promise<{
-  success: true
-  updatedUser: User
-  industryInsights: IndustryInsights
-}>
-
-
-function useFetch(cb:UpdateUserFn) {
-
-    const [loading,setLoading]=useState(false)
-    const [error,setError]=useState("")
-    const [data,setData]=useState({})
-
-    async function fetchData(data:formInfo){
+    // fetchData now accepts whatever arguments the callback requires
+    async function fetchData(...args: TArgs) {
         try {
             setLoading(true)
             setError("")
-            const res=await cb(data)
-            console.log("Updation response: ",res)
+            
+            // Pass the arguments directly to the callback
+            const res = await cb(...args)
+            console.log("Fetch response: ", res)
             setData(res)
+            
+            // Returning the response is a best practice so the calling component 
+            // can use the result immediately without waiting for state to update.
+            return res 
         } catch (error) {
-            console.log("Error updating user data in custom hook: ",error)
-            if(error instanceof Error){
+            console.log("Error in custom hook: ", error)
+            if (error instanceof Error) {
                 setError(error.message)
                 toast.error(error.message)
+            } else {
+                setError("An unknown error occurred")
+                toast.error("An unknown error occurred")
             }
-        } finally{
+        } finally {
             setLoading(false)
         }
     }  
-    return {loading,error,data,fetchData}
+
+    return { loading, error, data,setData, fetchData }
 }
 
 export default useFetch
