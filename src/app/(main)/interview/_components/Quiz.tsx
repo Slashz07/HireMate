@@ -64,7 +64,8 @@ function Quiz() {
   const handleSubmit = async () => {
       try {
         const score=calculateScore()
-        await saveQuizFn(quizData,answers,score.toFixed(2))
+        const res=await saveQuizFn(quizData,answers,parseFloat(score.toFixed(2)))
+        console.log("Quiz submit res: ",res)
         toast.success("Quiz submitted successfully")
       } catch (error) {
         console.log("error submitting quiz: ",error)
@@ -154,7 +155,7 @@ function Quiz() {
             )
           }
         </CardContent>
-        <CardFooter>
+        <CardFooter >
           {
             !showExplanation && (
               <Button disabled={!answers[currentQuestion]} onClick={() => setShowExplanation(true)}>
@@ -162,7 +163,7 @@ function Quiz() {
               </Button>
             )
           }
-          <div className='flex gap-2'>
+          <div className='ml-auto flex gap-2'>
             {
               currentQuestion > 0 && (
                 <Button variant={'outline'} onClick={handlePrev}>
