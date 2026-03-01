@@ -20,7 +20,7 @@ export const generateQuiz = async () => {
     }
     try {
         const prompt = `
-         Generate 12 technical interview questions for a ${user.industry} professional ${user.skills?.length ? `with expertise in ${user.skills.join(",")}` : ""}
+         Generate 10 technical interview questions for a ${user.industry} professional ${user.skills?.length ? `with expertise in ${user.skills.join(",")}` : ""}
  
          Each question should be multiple choice with 4 options.
  
@@ -87,7 +87,7 @@ export const saveQuizData = async (questions, answers, score) => {
              model: "gemini-2.5-flash",
              contents: improvementPrompt,
          });
- 
+        
          if (!response.text) throw new Error("Error accessing data in Gemini api");
  
          improvementTip= response.text.trim();
@@ -105,6 +105,6 @@ export const saveQuizData = async (questions, answers, score) => {
     return assessment
 
    } catch (error) {
-    console.log("Error generating improvement tip and saving quiz data to database")
+    console.log("Error generating improvement tip and saving quiz data to database: ",error)
    }
 }
