@@ -22,7 +22,8 @@ function Quiz() {
   const {
     loading: generatingQuiz,
     fetchData: generateQuizFn,
-    data: quizData
+    data: quizData,
+    setData: setQuizData
   } = useFetch(generateQuiz)
 
   const {
@@ -51,26 +52,26 @@ function Quiz() {
     setShowExplanation(false)
   }
 
-  const calculateScore=()=>{
-    let score=0;
-    answers.forEach((ans,idx)=>{
-      if(ans==quizData[idx].correctAnswer){
+  const calculateScore = () => {
+    let score = 0;
+    answers.forEach((ans, idx) => {
+      if (ans == quizData[idx].correctAnswer) {
         score++;
       }
     })
-    return (score/quizData.length)*100
+    return (score / quizData.length) * 100
   }
 
   const handleSubmit = async () => {
-      try {
-        const score=calculateScore()
-        const res=await saveQuizFn(quizData,answers,parseFloat(score.toFixed(2)))
-        console.log("Quiz submit res: ",res)
-        toast.success("Quiz submitted successfully")
-      } catch (error) {
-        console.log("error submitting quiz: ",error)
-        toast.error("Quiz couldn't be submitted")
-      }
+    try {
+      const score = calculateScore()
+      const res = await saveQuizFn(quizData, answers, parseFloat(score.toFixed(2)))
+      console.log("Quiz submit res: ", res)
+      toast.success("Quiz submitted successfully")
+    } catch (error) {
+      console.log("error submitting quiz: ", error)
+      toast.error("Quiz couldn't be submitted")
+    }
   }
 
 
@@ -83,21 +84,22 @@ function Quiz() {
     }
   }
 
-  const startNewQuiz=()=>{
+  const startNewQuiz = () => {
     setCurrentQuestion(0);
     setAnswers([]);
     setShowExplanation(false);
     generateQuizFn();
+    setQuizData(null);
     setResultData(null)
   }
 
   if (generatingQuiz) {
     return <BarLoader className='mt-4' width={"100%"} color='gray' />
   }
-  if(resultData){
+  if (resultData) {
     return (
       <div className='mx-2'>
-        <QuizResult result={resultData} onStartNew={startNewQuiz}/>
+        <QuizResult result={resultData} onStartNew={startNewQuiz} />
       </div>
     )
   }
@@ -109,7 +111,7 @@ function Quiz() {
         </CardHeader>
         <CardContent>
           <p className='text-muted-foreground'>
-            This quiz contains 12 questions apecific to your industry and skills.Take your time and choose the best answer for each questoion
+            This quiz contains 10 questions specific to your industry and skills.Take your time and choose the best answer for each questoion
           </p>
         </CardContent>
         <CardFooter>
@@ -171,9 +173,9 @@ function Quiz() {
                 </Button>
               )
             }
-            <Button variant={'outline'} onClick={handleNext} disabled={!answers[currentQuestion]||savingQuiz}>
+            <Button variant={'outline'} onClick={handleNext} disabled={!answers[currentQuestion] || savingQuiz}>
               {
-                savingQuiz&&<Loader2 className='mr-2 h-4 w-4 animate-spin'/>
+                savingQuiz && <Loader2 className='mr-2 h-4 w-4 animate-spin' />
               }
               {
                 currentQuestion < quizData.length - 1 ? "Next" : "Finish Quiz"
