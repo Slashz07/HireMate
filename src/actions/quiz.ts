@@ -35,9 +35,26 @@ export const generateQuiz = async () => {
                      }
              ]
          }
+             CRITICAL CONSTRAINTS - Divide the questions into two specific categories:
+        
+        Category 1: 5 Quick-Fire Questions
+        - Question text: strictly under 20 words.
+        - Options: under 10 words each.
+        - Explanation: strictly under 15 words.
+        
+        Category 2: 5 Deep-Thinking Scenario Questions
+        - Question text: 30-40 words. 
+        - Options: 10-20 words each. 
+        - Explanation: 15-20 words. 
+        
+        Do NOT group by category.
+        Do NOT label sections separately.
+        The questions MUST be randomly mixed in order.
+        Do NOT place all Quick-Fire or Deep-Thinking questions together.
+        The sequence should feel naturally shuffled.
          
      `;
-        const quiz=await getGeminiResponse(prompt)
+        const quiz = await getGeminiResponse(prompt)
 
         return quiz.questions
     } catch (error) {
@@ -67,15 +84,15 @@ export const saveQuizData = async (questions, answers, score) => {
         explanation: q.explanation
     }))
 
-   try {
-     const wrongQuestions = questionResults.filter((q) => !q.isCorrect)
-     let improvementTip=""
-     if (wrongQuestions.length > 0) {
-         const wrongQuestionsText = wrongQuestions.map((q) => (
-             `Question: "${q.question}"\nCorrect Answer: "${q.answer}"\nUser Answer:"${q.userAnswer}"`
-         )).join("\n\n")//.join() converts an array into a single string. .join("\n\n") here inserts double line breaks between each array elem when joining them
- 
-         const improvementPrompt = `
+    try {
+        const wrongQuestions = questionResults.filter((q) => !q.isCorrect)
+        let improvementTip = ""
+        if (wrongQuestions.length > 0) {
+            const wrongQuestionsText = wrongQuestions.map((q) => (
+                `Question: "${q.question}"\nCorrect Answer: "${q.answer}"\nUser Answer:"${q.userAnswer}"`
+            )).join("\n\n")//.join() converts an array into a single string. .join("\n\n") here inserts double line breaks between each array elem when joining them
+
+            const improvementPrompt = `
          The user got the following ${user.industry} techincal interview questions wrong:
          ${wrongQuestionsText} 
          Based on these mistakes, provide a concise, specific improvement tip.
@@ -83,28 +100,58 @@ export const saveQuizData = async (questions, answers, score) => {
          Keep the response under 2-3 sentences and make it encourging.
          Don't explicitly mention the mistakes, instead focus on what to learn/practice.
      `
-         const response = await ai.models.generateContent({
-             model: "gemini-2.5-flash",
-             contents: improvementPrompt,
-         });
-        
-         if (!response.text) throw new Error("Error accessing data in Gemini api");
- 
-         improvementTip= response.text.trim();
-         
-     }
-     const assessment=await db.assessment.create({
-         data:{
-             userId:user.id,
-             quizScore:score,
-             questions:questionResults,
-             category:"Techincal",
-             improvementTip,
-         }
-     })
-    return assessment
+            const response = await ai.models.generateContent({
+                model: "gemini-2.5-flash",
+                contents: improvementPrompt,
+            });
 
-   } catch (error) {
-    console.log("Error generating improvement tip and saving quiz data to database: ",error)
-   }
+            if (!response.text) throw new Error("Error accessing data in Gemini api");
+
+            improvementTip = response.text.trim();
+
+        }
+        const assessment = await db.assessment.create({
+            data: {
+                userId: user.id,
+                quizScore: score,
+                questions: questionResults,
+                category: "Techincal",
+                improvementTip,
+            }
+        })
+        return assessment
+
+    } catch (error) {
+        console.log("Error generating improvement tip and saving quiz data to database: ", error)
+    }
+}
+
+export const getAssessments = async () => {
+    const { userId } = await auth()
+    if (!userId) throw new Error("Unauthenticated Request")
+
+    const user = await db.user.findUnique({
+        where: {
+            clerkUserId: userId
+        }
+    })
+    // console.log("user: ",user)
+    if (!user) {
+        throw new Error("User not found")
+    }
+
+    try {
+        const assessments=await db.assessment.findMany({
+            where:{
+                userId:user.id
+            },
+            orderBy:{
+                createdAt:"asc"
+            }
+        })
+        return assessments
+    } catch (error) {
+        console.log("Error fetching asssesments: ",error)
+        throw new Error(error )
+    }
 }
