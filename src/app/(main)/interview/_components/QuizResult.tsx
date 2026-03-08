@@ -1,8 +1,8 @@
+"use client"
 import { Button } from '@/components/ui/button'
 import { CardContent, CardFooter } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { CheckCircle2, Trophy, XCircle } from 'lucide-react'
-import React from 'react'
 
 function QuizResult({ result, onStartNew, hideStartNew = false }) {
 
@@ -16,7 +16,7 @@ function QuizResult({ result, onStartNew, hideStartNew = false }) {
       </h1>
       <CardContent>
         <div>
-          <h3 className='text-2xl font-bold text-center'>{result.quizScore.toFixed(2)}%</h3>
+          <h3 className='text-2xl font-bold text-center'>{result.quizScore?.toFixed(2)}%</h3>
           <Progress value={result.quizScore} className='w-full' />
         </div>
         {
@@ -32,7 +32,7 @@ function QuizResult({ result, onStartNew, hideStartNew = false }) {
             Question Review
           </h3>
           {
-            result.questions.map((q, idx) => (
+            result?.questions?.map((q, idx) => (
               <div key={idx} className='border rounded-lg p-4 space-y-2'>
                 <div className='flex items-start justify-between gap-2'>
                   <p>{q.question}</p>
