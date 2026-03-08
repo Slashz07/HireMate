@@ -4,7 +4,7 @@ import { getAssessments } from '@/actions/quiz'
 import React from 'react'
 import StatsCards from './_components/StatsCards'
 import PerformanceCharts from './_components/PerformanceCharts'
-import QuizList from './_components/quizList'
+import QuizList from './_components/QuizList'
 
 async function page() {
 
