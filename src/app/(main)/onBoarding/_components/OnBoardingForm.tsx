@@ -69,12 +69,12 @@ function OnBoardingForm({ industries }: { industries: industryType[] }) {
         industry:formattedIndustry
       })
     } catch (error) {
-      
+      console.log("error submitting onboarding form : ",error)
     }
   }
 
   useEffect(()=>{
-    if(!isLoading&&Object.keys(res).length>0&&!err){
+    if(!isLoading&&res&&Object.keys(res).length>0&&!err){
       toast.success("User Onboarded Successfully!")
       router.push('/dashBoard')
       router.refresh()
