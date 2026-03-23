@@ -50,7 +50,7 @@ function QuizList({ assessments }) {
         </CardContent>
       </Card>
       <Dialog open={!!performance} onOpenChange={()=>setPerformance(null)}>
-        <DialogContent className='max-w-3xl max-h-[90vh] overflow-y-auto'>
+        <DialogContent className='sm:max-w-4xl max-h-[90vh] overflow-y-auto'>
             <QuizResult
               result={performance}
               onStartNew={()=>router.push('/interview/Mock')}
