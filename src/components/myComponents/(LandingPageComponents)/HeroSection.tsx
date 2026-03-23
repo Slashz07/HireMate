@@ -39,14 +39,9 @@ function HeroSection() {
                     </p>
                 </div>
                 <div className='flex justify-center space-x-4'>
-                    <Link href={'/dashboard'}>
+                    <Link href={'/dashBoard'}>
                         <Button size={'lg'} className='px-8'>
                             Get Started
-                        </Button>
-                    </Link>
-                    <Link href={'/ytLink'}>
-                        <Button size={'lg'} variant={'outline'} className='px-8'>
-                            Watch Demo
                         </Button>
                     </Link>
                 </div>
