@@ -12,7 +12,7 @@ function StatsCards({assessments}) {
    }
     
    const latestAssessmentScore=()=>{
-     if(!assessments?.length) return null
+     if(!assessments?.length) return 0
      return assessments[0].quizScore.toFixed(2)
    }
 
