@@ -71,7 +71,7 @@ model Resume{
   id              String @id @default(cuid())
   userId          String  @unique
   user            User @relation(fields: [userId],references: [id])
-  content         String @db.Text
+  content         Json
   atsScore        Float?
   feedback        String?
   createdAt       DateTime @default(now())
