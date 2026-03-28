@@ -14,7 +14,7 @@ import QuizResult from './QuizResult'
 function Quiz() {
 
   const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [answers, setAnswers] = useState<string[]>([])
+  const [answers, setAnswers] = useState<(string|null)[]>([])
   const [showExplanation, setShowExplanation] = useState(false)
 
 
@@ -140,7 +140,7 @@ function Quiz() {
             onValueChange={handleAns}
           >
             {
-              question.options.map((opt, idx) => (
+              question.options.map((opt:string, idx:number) => (
                 <div key={idx} className="flex items-center gap-3">
                   <RadioGroupItem value={`${opt}`} id={`option-${idx}`} />
                   <Label htmlFor={`option-${idx}`}>{opt}</Label>

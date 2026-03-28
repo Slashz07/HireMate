@@ -62,8 +62,13 @@ export const generateQuiz = async () => {
         throw new Error(`Error generating quiz questions via gemini: ${error}`)
     }
 }
-
-export const saveQuizData = async (questions, answers, score) => {
+export interface QuizQuestion {
+    question: string;
+    options: string[];
+    correctAnswer: string;
+    explanation: string;
+}
+export const saveQuizData = async (questions:QuizQuestion[], answers:(string | null)[], score:number) => {
     const { userId } = await auth()
     if (!userId) throw new Error("Unauthenticated Request")
 
@@ -141,17 +146,19 @@ export const getAssessments = async () => {
     }
 
     try {
-        const assessments=await db.assessment.findMany({
-            where:{
-                userId:user.id
+        const assessments = await db.assessment.findMany({
+            where: {
+                userId: user.id
             },
-            orderBy:{
-                createdAt:"asc"
+            orderBy: {
+                createdAt: "asc"
             }
         })
         return assessments
     } catch (error) {
-        console.log("Error fetching asssesments: ",error)
-        throw new Error(error )
+        console.log("Error fetching asssesments: ", error)
+        if (error instanceof Error) {
+            throw new Error(error.message)
+        }
     }
 }

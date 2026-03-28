@@ -1,13 +1,14 @@
 "use server"
+import { resumeSchemaType } from "@/app/(main)/resume/_components/ResumeBuilder"
 import { getGeminiResponse } from "@/lib/gemini"
 import { db } from "@/lib/prisma"
 import { auth } from "@clerk/nextjs/server"
 import { revalidatePath } from "next/cache"
 
 
-export const saveResume = async (content) => {
+export const saveResume = async (content: resumeSchemaType) => {
     const res = content
-    console.log("recieved data at backend: ",)
+    console.log("recieved data at backend: ", res)
     const { userId } = await auth()
     if (!userId) throw new Error("Unauthenticated Request")
 
@@ -36,7 +37,9 @@ export const saveResume = async (content) => {
         return resume
     } catch (error) {
         console.log(error)
-        throw new Error("Error saving resume", error)
+        if (error instanceof Error) {
+            throw new Error("Error saving resume", error)
+        }
     }
 }
 
@@ -60,11 +63,13 @@ export const getResume = async () => {
         })
     } catch (error) {
         console.log("Error fetching resume data from database: ", error)
-        throw new Error("Error fetching resume data from database: ", error)
+          if (error instanceof Error) {
+            throw new Error("Error fetching resume data from database:", error)
+        }
     }
 }
 
-export const improveWithAi = async ({ current, type, org }) => {
+export const improveWithAi = async ({ current, type, org }:{current:string,type:string,org:string}) => {
     const { userId } = await auth()
     if (!userId) throw new Error("Unauthenticated Request")
 
@@ -98,7 +103,7 @@ Format the response as a single paragraph without any additional text or explana
         throw new Error("Error improving the content via gemini")
     }
 }
-export const improveSummaryWithAi = async ({current}) => {
+export const improveSummaryWithAi = async ({ current }:{current:string}) => {
     const { userId } = await auth()
     if (!userId) throw new Error("Unauthenticated Request")
 

@@ -20,8 +20,9 @@ import { improveWithAi } from "@/actions/resume";
 import { toast } from "sonner";
 import { Checkbox } from "@/components/ui/checkbox";
 import { format, parse } from "date-fns";
+import { entrySchemaType } from "./ResumeBuilder";
 
-const EntryForm = ({ type, enteries, onChange }) => {
+const EntryForm = ({ type, enteries, onChange }:{type:string,enteries:entrySchemaType[],onChange:(updatedEntries: entrySchemaType[]) => void}) => {
   const {
     register,
     handleSubmit: handleValidation,

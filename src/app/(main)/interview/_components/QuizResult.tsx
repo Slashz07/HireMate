@@ -32,7 +32,7 @@ function QuizResult({ result, onStartNew, hideStartNew = false }) {
             Question Review
           </h3>
           {
-            result?.questions?.map((q, idx) => (
+            result?.questions?.map((q, idx:number) => (
               <div key={idx} className='border rounded-lg p-4 space-y-2'>
                 <div className='flex items-start justify-between gap-2'>
                   <p>{q.question}</p>

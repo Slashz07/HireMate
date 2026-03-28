@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Textarea } from '@/components/ui/textarea'
 import useFetch from '@/hooks/fetch-hook/useFetch'
-import { resumeSchema } from '@/lib/schema'
+import { contactSchema, entrySchema, resumeSchema } from '@/lib/schema'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertTriangle, Download, Edit, Loader2, Monitor, Save, Sparkles } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -17,30 +17,11 @@ import MDEditor, { PreviewType } from '@uiw/react-md-editor'
 import html2pdf from "html2pdf.js/dist/html2pdf.min.js";
 
 import { toast } from 'sonner'
+import z from 'zod'
 
-export type entrySchemaType = {
-  title: string,
-  organization: string,
-  description: string,
-  startDate: string,
-  endDate?: string,
-  current?: boolean
-}
-export type contactSchemaType={
-    email:string,
-    mobile:string,
-    linkedin?:string,
-    twitter?:string
-}
-
-export type resumeSchemaType={
-    contactInfo:contactSchemaType,
-    summary:string,
-    skills:string,
-    experience:entrySchemaType[],
-    projects:entrySchemaType[],
-    education:entrySchemaType[]
-}
+export type entrySchemaType = z.infer<typeof entrySchema>;
+export type contactSchemaType = z.infer<typeof contactSchema>;
+export type resumeSchemaType = z.infer<typeof resumeSchema>;
 const ResumeBuilder = ({ initialContent }:{initialContent:resumeSchemaType|null}) => {
 
   const [activeTab, setActiveTab] = useState('edit')
@@ -52,7 +33,7 @@ const ResumeBuilder = ({ initialContent }:{initialContent:resumeSchemaType|null}
   const { register,setValue, handleSubmit, control, watch, formState: { errors } } = useForm({
     resolver: zodResolver(resumeSchema),
     defaultValues: {
-      contactInfo: initialContent?.contactInfo??{},
+      contactInfo: initialContent?.contactInfo ?? { email: "" },
       summary: initialContent?.summary??"",
       skills: initialContent?.skills??"",
       experience: initialContent?.experience??[],
@@ -122,16 +103,18 @@ const ResumeBuilder = ({ initialContent }:{initialContent:resumeSchemaType|null}
         html2canvas: {
           scale: 2,
           useCORS: true,
-          onclone: (clonedDoc) => {
+          onclone: (clonedDoc:Document) => {
             const allElements = clonedDoc.querySelectorAll('*');
 
             // 2. Force inline styles to override UIW's CSS variables
             // This guarantees html2canvas only reads safe Hex/RGB values
-            allElements.forEach(el => {
+            allElements.forEach((el: Element) => {
+              if (el instanceof HTMLElement) {
               el.style.setProperty('color', '#000000', 'important');
               el.style.setProperty('background-color', 'transparent', 'important');
               el.style.setProperty('border-color', '#cccccc', 'important');
               el.style.setProperty('text-decoration-color', '#000000', 'important');
+              }
             });
 
             // 3. Ensure the main background is solid white (not transparent)
@@ -189,7 +172,7 @@ const ResumeBuilder = ({ initialContent }:{initialContent:resumeSchemaType|null}
       }
     };
 
-  const handleResume = async (data) => {
+  const handleResume = async (data:resumeSchemaType) => {
     try {
       console.log("submitted data: ",data)
       const res=await saveResumeFn(data)
