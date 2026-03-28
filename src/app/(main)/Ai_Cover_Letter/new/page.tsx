@@ -13,6 +13,13 @@ import React, { useEffect } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 
+
+export type coverLetterType={
+    companyName:string,
+    JobTitle:string,
+    jobDescription:string,
+}
+
 function CreateNewCoverLetter() {
   const { register, handleSubmit, control, formState: { errors }, reset } = useForm({
     resolver: zodResolver(coverLetterSchema),
@@ -30,7 +37,7 @@ function CreateNewCoverLetter() {
     error: coverLetterError,
   } = useFetch(createCoverLetter)
 
-  const generateCoverLetter = async (data) => {
+  const generateCoverLetter = async (data:coverLetterType) => {
     try {
       console.log("cover letter form data recieved: ", data)
       await coverLetterFn(data)

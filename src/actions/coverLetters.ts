@@ -1,4 +1,5 @@
 "use server";
+import { coverLetterType } from "@/app/(main)/Ai_Cover_Letter/new/page";
 import { getGeminiResponse } from "@/lib/gemini";
 import { db } from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
@@ -35,7 +36,7 @@ export async function getCoverLetters(): Promise<CoverLetter[]> {
     }
 }
 
-export async function createCoverLetter(formData) {
+export async function createCoverLetter(formData:coverLetterType) {
     const { userId } = await auth();
     if (!userId) throw new Error("Unauthenticated Request");
 
@@ -50,7 +51,7 @@ export async function createCoverLetter(formData) {
 
     try {
         const prompt = `
-    Write a professional cover letter for a ${formData.jobTitle} position at ${formData.companyName}
+    Write a professional cover letter for a ${formData.JobTitle} position at ${formData.companyName}
 
     About the candidate:
     - Industry: ${user.industry}
