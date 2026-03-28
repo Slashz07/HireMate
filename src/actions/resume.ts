@@ -6,6 +6,8 @@ import { revalidatePath } from "next/cache"
 
 
 export const saveResume = async (content) => {
+    const res = content
+    console.log("recieved data at backend: ",)
     const { userId } = await auth()
     if (!userId) throw new Error("Unauthenticated Request")
 
@@ -94,5 +96,55 @@ Format the response as a single paragraph without any additional text or explana
     } catch (error) {
         console.log("Error improving the resume content via gemini: ", error)
         throw new Error("Error improving the content via gemini")
+    }
+}
+export const improveSummaryWithAi = async ({current}) => {
+    const { userId } = await auth()
+    if (!userId) throw new Error("Unauthenticated Request")
+
+    const user = await db.user.findUnique({
+        where: {
+            clerkUserId: userId
+        }
+    })
+    if (!user) {
+        throw new Error("User not found")
+    }
+    const prompt = `
+        You are an expert resume writer specializing in IT professionals.
+
+Your task is to improve and rewrite the user's professional summary to make it:
+- Clear, concise, and impactful
+- Tailored to the user's industry and IT sub-industry
+- Results-driven with measurable achievements where possible
+- Professional and modern in tone
+- Optimized for ATS (Applicant Tracking Systems)
+- Free of grammar or spelling issues
+
+Context:
+- Industry: ${user.industry}
+
+Guidelines:
+- Keep it between 2-4 sentences
+- Use strong action verbs
+- Highlight relevant technical skills and domain expertise based on the industry context
+- Emphasize business impact and achievements
+- Do NOT add false information — only improve what is provided
+- If the input is vague, enhance clarity while staying truthful
+
+User Input:
+"""
+${current}
+"""
+
+Output only the improved professional summary as plain text.
+Do not include explanations, labels, or formatting.
+    `
+    try {
+        const res = await getGeminiResponse(prompt, false)
+        return res
+    } catch (error) {
+        console.log("Error improving the resume summary section via gemini: ", error)
+        throw new Error("Error improving the resume summary section via gemini")
     }
 }
