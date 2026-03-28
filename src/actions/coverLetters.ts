@@ -29,9 +29,9 @@ export async function getCoverLetters(): Promise<CoverLetter[]> {
         return coverLetters ?? [];
     } catch (error) {
         console.log("Error fetching coverLetters: ", error);
-        if (error instanceof Error) {
-            throw new Error(error.message);
-        }
+        throw new Error(
+            error instanceof Error ? error.message : "Unknown error"
+        );
     }
 }
 
@@ -73,17 +73,17 @@ export async function createCoverLetter(formData) {
     CRITICAL FORMATTING INSTRUCTIONS:
     Output the letter STRICTLY in plain text. Do NOT use any markdown syntax whatsoever (no     asterisks ** for bolding, no brackets [], no hash symbols #, etc.). The final output must be pure, unformatted text that relies only on spaces and carriage returns (new lines) so it can be pasted directly into a standard email body.`
 
-    const content = await getGeminiResponse(prompt, false);
-    console.log("gemini res: ", content);
-    const coverLetter = await db.coverLetter.create({
-        data: {
-            userId: user.id,
-            content,
-            ...formData,
-        },
-    });
-    return coverLetter;
-    
+        const content = await getGeminiResponse(prompt, false);
+        console.log("gemini res: ", content);
+        const coverLetter = await db.coverLetter.create({
+            data: {
+                userId: user.id,
+                content,
+                ...formData,
+            },
+        });
+        return coverLetter;
+
     } catch (error) {
         console.log("Error fetching coverLetters: ", error);
         if (error instanceof Error) {
