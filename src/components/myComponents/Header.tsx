@@ -31,7 +31,7 @@ const menuItems:MenuItems[]=[
     {
         label:"Cover Letter",
         icon:PenBox,
-        href:"/coverLetter"
+        href:"/Ai_Cover_Letter"
     },
      {
         label:"Interview Prep",
