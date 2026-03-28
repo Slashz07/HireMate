@@ -9,13 +9,9 @@ import CoverLettersList from './_components/CoverLettersList'
 
 
 async function MyCoverLetters() {
-
-  try {
     const coverLetters: CoverLetter[] = await getCoverLetters()
     console.log("Cover letters: ", coverLetters)
-  } catch (error) {
-    console.log("Error fetching Coverletters: ",error)
-  }
+  
 
   return (
     <div>
