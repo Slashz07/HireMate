@@ -8,7 +8,7 @@ import QuizList from './_components/QuizList'
 
 async function page() {
 
-  const assessments=await getAssessments()
+  const assessments=await getAssessments()??[]
   console.log("Assessments: ",assessments)
 
   return (
@@ -16,6 +16,7 @@ async function page() {
       <h1 className='text-6xl font-bold gradient-title mb-5'>
         Interview Preparation
       </h1>
+      
       <div className='flex flex-col gap-4'>
         <StatsCards assessments={assessments}/>
         <PerformanceCharts assessments={assessments}/>

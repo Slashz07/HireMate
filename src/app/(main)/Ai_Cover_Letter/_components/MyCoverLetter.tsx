@@ -1,12 +1,13 @@
 "use client"
 import { Button } from '@/components/ui/button'
 import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { CoverLetter } from '@prisma/client'
 import { format } from 'date-fns'
 import { Eye,  Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import React from 'react'
 
-function MyCoverLetter({ letterData,deleteCoverLetter }) {
+function MyCoverLetter({ letterData,deleteCoverLetter }:{letterData:CoverLetter,deleteCoverLetter:(id: string) => Promise<void>}) {
   const date=format(letterData.createdAt,"MMMM do yyyy")
   return (
     <div className='space-y-2 my-3'>

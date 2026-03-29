@@ -1,6 +1,4 @@
 import { CoverLetter } from '@prisma/client'
-import React from 'react'
-import MyCoverLetter from './_components/MyCoverLetter'
 import { getCoverLetters } from '@/actions/coverLetters'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'

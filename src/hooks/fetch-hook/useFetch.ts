@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 // We use TArgs (arguments) and TRes (response) as generic placeholders.
 // TArgs extends any[] allows the callback to take zero, one, or multiple arguments.
-function useFetch<TArgs extends any[], TRes>(cb: (...args: TArgs) => Promise<TRes>) {
+function useFetch<TArgs extends never[], TRes>(cb: (...args: TArgs) => Promise<TRes>) {
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState("")
     

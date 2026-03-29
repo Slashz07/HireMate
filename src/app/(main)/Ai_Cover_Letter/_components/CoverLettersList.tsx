@@ -3,8 +3,9 @@ import React, { useState } from 'react'
 import MyCoverLetter from './MyCoverLetter'
 import { deleteCoverLetter } from '@/actions/coverLetters'
 import { toast } from 'sonner'
+import { CoverLetter } from '@prisma/client'
 
-function CoverLettersList({ list }) {
+function CoverLettersList({ list }:{list:CoverLetter[]}) {
     const [CoverLettersList, setCoverLettersList] = useState(list || [])
     
 

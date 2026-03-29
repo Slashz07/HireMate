@@ -1,8 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Assessment } from '@prisma/client'
 import { TrophyIcon } from 'lucide-react'
 import React from 'react'
 
-function StatsCards({assessments}) {
+function StatsCards({assessments}:{assessments:Assessment[]}) {
    const quizAvgScore=()=>{
      if(!assessments?.length) return 0
     const total=assessments.reduce((sum,assessment)=>(

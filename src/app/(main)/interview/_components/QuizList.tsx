@@ -6,10 +6,11 @@ import { format } from 'date-fns'
 import { useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import QuizResult from './QuizResult'
+import { Assessment } from '@prisma/client'
 
-function QuizList({ assessments }) {
+function QuizList({ assessments }:{assessments:Assessment[]}) {
   const router = useRouter()
-  const [performance, setPerformance] = useState(null)
+  const [performance, setPerformance] = useState<Assessment|null>(null)
   return (
     <div>
       <Card className='cursor-pointer hover:bg-muted/50 transition-colors'>
@@ -52,7 +53,7 @@ function QuizList({ assessments }) {
       <Dialog open={!!performance} onOpenChange={()=>setPerformance(null)}>
         <DialogContent className='sm:max-w-4xl max-h-[90vh] overflow-y-auto'>
             <QuizResult
-              result={performance}
+              result={performance as Assessment}
               onStartNew={()=>router.push('/interview/Mock')}
               hideStartNew
             />

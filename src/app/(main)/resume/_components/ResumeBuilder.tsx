@@ -14,7 +14,7 @@ import EntryForm from './EntryForm'
 import { useUser } from '@clerk/nextjs'
 import enteriesToMarkdown from '@/lib/resumeHelper'
 import MDEditor, { PreviewType } from '@uiw/react-md-editor'
-import html2pdf from "html2pdf.js/dist/html2pdf.min.js";
+// import html2pdf from "html2pdf.js/dist/html2pdf.min.js";
 
 import { toast } from 'sonner'
 import z from 'zod'
@@ -28,7 +28,6 @@ const ResumeBuilder = ({ initialContent }:{initialContent:resumeSchemaType|null}
   const [resumeMode, setResumeMode] = useState<PreviewType>("preview")
   const [previewContent, setPreviewContent] = useState("")
   const [isgeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false)
-  const { user } = useUser()
   const resumeRef = useRef<HTMLDivElement>(null)
   const { register,setValue, handleSubmit, control, watch, formState: { errors } } = useForm({
     resolver: zodResolver(resumeSchema),
@@ -43,6 +42,8 @@ const ResumeBuilder = ({ initialContent }:{initialContent:resumeSchemaType|null}
   })
 
   const formValues = watch()//provides all values in the form
+  const { user, isLoaded } = useUser()
+const initialPreviewGenerated = useRef(false)
 
   const {
     data: saveResult,
@@ -55,15 +56,19 @@ const ResumeBuilder = ({ initialContent }:{initialContent:resumeSchemaType|null}
     if (initialContent) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveTab("preview")
+      
     }
   }, [initialContent])
 
-  useEffect(() => {
-    if (activeTab == "edit") {
+useEffect(() => {
+    if (!isLoaded) return;
+    
+    if (activeTab === "edit" || !initialPreviewGenerated.current) {
       const data = handlePreviewContent()
       setPreviewContent(data)
+      initialPreviewGenerated.current = true // Mark that the initial load is done
     }
-  }, [activeTab, formValues])
+  }, [activeTab, formValues, isLoaded, user])
 
   const getContactMarkdownValues = () => {
     const { contactInfo } = formValues
@@ -95,6 +100,10 @@ const ResumeBuilder = ({ initialContent }:{initialContent:resumeSchemaType|null}
   const generatePdf = async () => {
     setIsGeneratingPdf(true)
     try {
+      // Dynamically import html2pdf
+      const html2pdfModule = await import("html2pdf.js/dist/html2pdf.min.js");
+      const html2pdf = html2pdfModule.default || html2pdfModule;
+
       const elem = resumeRef.current
       const opt = {
         margin: [15, 15],
@@ -103,21 +112,34 @@ const ResumeBuilder = ({ initialContent }:{initialContent:resumeSchemaType|null}
         html2canvas: {
           scale: 2,
           useCORS: true,
-          onclone: (clonedDoc:Document) => {
-            const allElements = clonedDoc.querySelectorAll('*');
-
-            // 2. Force inline styles to override UIW's CSS variables
-            // This guarantees html2canvas only reads safe Hex/RGB values
-            allElements.forEach((el: Element) => {
-              if (el instanceof HTMLElement) {
-              el.style.setProperty('color', '#000000', 'important');
-              el.style.setProperty('background-color', 'transparent', 'important');
-              el.style.setProperty('border-color', '#cccccc', 'important');
-              el.style.setProperty('text-decoration-color', '#000000', 'important');
+          onclone: (clonedDoc: Document) => {
+            
+            // 1. SAFEGURARD: Strip unsupported colors from style tags
+            const styleTags = clonedDoc.querySelectorAll('style');
+            styleTags.forEach((style) => {
+              if (style.innerHTML.includes('lab(') || style.innerHTML.includes('oklch(')) {
+                // Replace modern color functions with standard black hex to prevent parsing crashes
+                style.innerHTML = style.innerHTML.replace(/lab\(.*?\)/g, '#000000');
+                style.innerHTML = style.innerHTML.replace(/oklch\(.*?\)/g, '#000000');
               }
             });
 
-            // 3. Ensure the main background is solid white (not transparent)
+            // 2. CRITICAL FIX: Target both HTMLElements AND SVGElements
+            const allElements = clonedDoc.querySelectorAll('*');
+            allElements.forEach((el: Element) => {
+              if (el instanceof HTMLElement || el instanceof SVGElement) {
+                el.style.setProperty('color', '#000000', 'important');
+                el.style.setProperty('background-color', 'transparent', 'important');
+                el.style.setProperty('border-color', '#cccccc', 'important');
+                el.style.setProperty('text-decoration-color', '#000000', 'important');
+                
+                // Override SVG specific properties that cause the SVGElementContainer crash
+                el.style.setProperty('fill', '#000000', 'important');
+                el.style.setProperty('stroke', '#000000', 'important');
+              }
+            });
+
+            // 3. Ensure the main background is solid white
             const container = clonedDoc.getElementById('pdf-resume-wrapper');
             if (container) {
               container.style.setProperty('background-color', '#ffffff', 'important');
@@ -139,7 +161,6 @@ const ResumeBuilder = ({ initialContent }:{initialContent:resumeSchemaType|null}
       setIsGeneratingPdf(false)
     }
   }
-
    const {
       loading: improvingSummary,
       fetchData: improveSummaryWithAiFn,

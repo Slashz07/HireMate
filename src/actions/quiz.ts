@@ -6,6 +6,14 @@ import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
+ export type quizResultType={
+        question:string,
+        answer:string,
+        userAnswer:string,
+        isCorrect:boolean,
+        explanation:string
+    }
+
 export const generateQuiz = async () => {
     const { userId } = await auth()
     if (!userId) throw new Error("Unauthenticated Request")
@@ -81,10 +89,12 @@ export const saveQuizData = async (questions:QuizQuestion[], answers:(string | n
         throw new Error("User not found")
     }
 
-    const questionResults = questions.map((q, idx) => ({
+    
+
+    const questionResults:quizResultType[] = questions.map((q, idx) => ({
         question: q.question,
         answer: q.correctAnswer,
-        userAnswer: answers[idx],
+        userAnswer: answers[idx] as string,
         isCorrect: q.correctAnswer == answers[idx],
         explanation: q.explanation
     }))

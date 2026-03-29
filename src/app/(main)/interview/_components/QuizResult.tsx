@@ -1,13 +1,21 @@
 "use client"
+import { quizResultType } from '@/actions/quiz'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardFooter } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
+import { Assessment } from '@prisma/client'
 import { CheckCircle2, Trophy, XCircle } from 'lucide-react'
 
-function QuizResult({ result, onStartNew, hideStartNew = false }) {
+type QuizResultProps = {
+  result: Assessment; 
+  onStartNew: () => void;
+  hideStartNew?: boolean;
+};
+
+function QuizResult({ result, onStartNew, hideStartNew = false }:QuizResultProps) {
 
   if (!result) return null
-
+  const questions: quizResultType[] = (result?.questions ?? []) as quizResultType[];
   return (
     <div>
       <h1 className='flex items-center gap-2 text-3xl gradient-title'>
@@ -32,7 +40,7 @@ function QuizResult({ result, onStartNew, hideStartNew = false }) {
             Question Review
           </h3>
           {
-            result?.questions?.map((q, idx:number) => (
+            questions?.map((q, idx:number) => (
               <div key={idx} className='border rounded-lg p-4 space-y-2'>
                 <div className='flex items-start justify-between gap-2'>
                   <p>{q.question}</p>

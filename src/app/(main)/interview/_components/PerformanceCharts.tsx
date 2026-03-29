@@ -1,11 +1,12 @@
 "use client"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Assessment } from '@prisma/client'
 import { format } from 'date-fns'
 import React, { useEffect, useState } from 'react'
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 
-function PerformanceCharts({ assessments }) {
-    const [chartData, setChartData] = useState([])
+function PerformanceCharts({ assessments }:{assessments:Assessment[]}) {
+    const [chartData, setChartData] = useState<{date:string,score:number}[]>([])
     useEffect(() => {
         if (assessments) {
             const formattedData = assessments.map((assessment) => {
