@@ -4,6 +4,8 @@ import { redirect } from 'next/navigation'
 import DashBoardView from './_components/DashBoardView'
 import { IndustryInsights } from '@prisma/client'
 
+export const dynamic = 'force-dynamic';
+
 async function industryInsights() {
     const {isOnBoarded}=await getOnboardingStatus()
     if(!isOnBoarded){

@@ -3,7 +3,7 @@ import OnBoardingForm from './_components/OnBoardingForm'
 import { industries } from '@/data/industries'
 import { getOnboardingStatus } from '@/actions/user'
 import { redirect } from 'next/navigation'
-
+export const dynamic = 'force-dynamic';
 async function page() {
   const {isOnBoarded}=await getOnboardingStatus()
   if(isOnBoarded){
