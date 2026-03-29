@@ -6,15 +6,21 @@ import { GoogleGenAI } from "@google/genai";
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
- export type quizResultType={
-        question:string,
-        answer:string,
-        userAnswer:string,
-        isCorrect:boolean,
-        explanation:string
-    }
+export type quizResultType = {
+    question: string,
+    answer: string,
+    userAnswer: string,
+    isCorrect: boolean,
+    explanation: string
+}
+export interface QuizQuestion {
+    question: string;
+    options: ["string", "string", "string", "string"],
+    correctAnswer: string;
+    explanation: string;
+}
 
-export const generateQuiz = async () => {
+export const generateQuiz = async (): Promise<QuizQuestion[]> => {
     const { userId } = await auth()
     if (!userId) throw new Error("Unauthenticated Request")
 
@@ -63,20 +69,14 @@ export const generateQuiz = async () => {
          
      `;
         const quiz = await getGeminiResponse(prompt)
-
         return quiz.questions
     } catch (error) {
         console.log("Error generating quiz questions via gemini : ", error as unknown)
         throw new Error(`Error generating quiz questions via gemini: ${error}`)
     }
 }
-export interface QuizQuestion {
-    question: string;
-    options: string[];
-    correctAnswer: string;
-    explanation: string;
-}
-export const saveQuizData = async (questions:QuizQuestion[], answers:(string | null)[], score:number) => {
+
+export const saveQuizData = async (questions: QuizQuestion[], answers: (string | null)[], score: number) => {
     const { userId } = await auth()
     if (!userId) throw new Error("Unauthenticated Request")
 
@@ -89,9 +89,9 @@ export const saveQuizData = async (questions:QuizQuestion[], answers:(string | n
         throw new Error("User not found")
     }
 
-    
 
-    const questionResults:quizResultType[] = questions.map((q, idx) => ({
+
+    const questionResults: quizResultType[] = questions.map((q, idx) => ({
         question: q.question,
         answer: q.correctAnswer,
         userAnswer: answers[idx] as string,

@@ -11,10 +11,11 @@ import { BarLoader } from 'react-spinners'
 import { toast } from 'sonner'
 import QuizResult from './QuizResult'
 
+
 function Quiz() {
 
   const [currentQuestion, setCurrentQuestion] = useState(0)
-  const [answers, setAnswers] = useState<(string|null)[]>([])
+  const [answers, setAnswers] = useState<(string | null)[]>([])
   const [showExplanation, setShowExplanation] = useState(false)
 
 
@@ -53,6 +54,7 @@ function Quiz() {
   }
 
   const calculateScore = () => {
+    if (!quizData) return;
     let score = 0;
     answers.forEach((ans, idx) => {
       if (ans == quizData[idx].correctAnswer) {
@@ -64,7 +66,9 @@ function Quiz() {
 
   const handleSubmit = async () => {
     try {
-      const score = calculateScore()
+    if (!quizData) return;
+
+      const score = calculateScore() as number??0
       const res = await saveQuizFn(quizData, answers, parseFloat(score.toFixed(2)))
       console.log("Quiz submit res: ", res)
       toast.success("Quiz submitted successfully")
@@ -76,6 +80,7 @@ function Quiz() {
 
 
   const handleNext = () => {
+    if (!quizData) return;
     if (currentQuestion < quizData.length - 1) {
       setCurrentQuestion(currentQuestion + 1)
       setShowExplanation(false)
@@ -140,7 +145,7 @@ function Quiz() {
             onValueChange={handleAns}
           >
             {
-              question.options.map((opt:string, idx:number) => (
+              question.options.map((opt: string, idx: number) => (
                 <div key={idx} className="flex items-center gap-3">
                   <RadioGroupItem value={`${opt}`} id={`option-${idx}`} />
                   <Label htmlFor={`option-${idx}`}>{opt}</Label>

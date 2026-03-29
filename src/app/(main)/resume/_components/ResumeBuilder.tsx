@@ -22,28 +22,36 @@ import z from 'zod'
 export type entrySchemaType = z.infer<typeof entrySchema>;
 export type contactSchemaType = z.infer<typeof contactSchema>;
 export type resumeSchemaType = z.infer<typeof resumeSchema>;
-const ResumeBuilder = ({ initialContent }:{initialContent:resumeSchemaType|null}) => {
+const ResumeBuilder = ({ initialContent }: { initialContent: resumeSchemaType | null }) => {
 
   const [activeTab, setActiveTab] = useState('edit')
   const [resumeMode, setResumeMode] = useState<PreviewType>("preview")
   const [previewContent, setPreviewContent] = useState("")
   const [isgeneratingPdf, setIsGeneratingPdf] = useState<boolean>(false)
   const resumeRef = useRef<HTMLDivElement>(null)
-  const { register,setValue, handleSubmit, control, watch, formState: { errors } } = useForm({
+  const { register, setValue, handleSubmit, control, watch, formState: { errors } } = useForm({
     resolver: zodResolver(resumeSchema),
     defaultValues: {
       contactInfo: initialContent?.contactInfo ?? { email: "" },
-      summary: initialContent?.summary??"",
-      skills: initialContent?.skills??"",
-      experience: initialContent?.experience??[],
-      education: initialContent?.education??[],
-      projects: initialContent?.projects??[]
+      summary: initialContent?.summary ?? "",
+      skills: initialContent?.skills ?? "",
+      experience: initialContent?.experience ?? [],
+      education: initialContent?.education ?? [],
+      projects: initialContent?.projects ?? []
     }
   })
 
+  type Html2Pdf = () => {
+    set: (opt: unknown) => {
+      from: (el: HTMLElement | null) => {
+        save: () => Promise<void>;
+      };
+    };
+  }
+
   const formValues = watch()//provides all values in the form
   const { user, isLoaded } = useUser()
-const initialPreviewGenerated = useRef(false)
+  const initialPreviewGenerated = useRef(false)
 
   const {
     data: saveResult,
@@ -56,13 +64,13 @@ const initialPreviewGenerated = useRef(false)
     if (initialContent) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveTab("preview")
-      
+
     }
   }, [initialContent])
 
-useEffect(() => {
+  useEffect(() => {
     if (!isLoaded) return;
-    
+
     if (activeTab === "edit" || !initialPreviewGenerated.current) {
       const data = handlePreviewContent()
       setPreviewContent(data)
@@ -102,7 +110,7 @@ useEffect(() => {
     try {
       // Dynamically import html2pdf
       const html2pdfModule = await import("html2pdf.js/dist/html2pdf.min.js");
-      const html2pdf = html2pdfModule.default || html2pdfModule;
+      const html2pdf = (html2pdfModule.default || html2pdfModule) as Html2Pdf;
 
       const elem = resumeRef.current
       const opt = {
@@ -113,7 +121,7 @@ useEffect(() => {
           scale: 2,
           useCORS: true,
           onclone: (clonedDoc: Document) => {
-            
+
             // 1. SAFEGURARD: Strip unsupported colors from style tags
             const styleTags = clonedDoc.querySelectorAll('style');
             styleTags.forEach((style) => {
@@ -132,7 +140,7 @@ useEffect(() => {
                 el.style.setProperty('background-color', 'transparent', 'important');
                 el.style.setProperty('border-color', '#cccccc', 'important');
                 el.style.setProperty('text-decoration-color', '#000000', 'important');
-                
+
                 // Override SVG specific properties that cause the SVGElementContainer crash
                 el.style.setProperty('fill', '#000000', 'important');
                 el.style.setProperty('stroke', '#000000', 'important');
@@ -161,65 +169,65 @@ useEffect(() => {
       setIsGeneratingPdf(false)
     }
   }
-   const {
-      loading: improvingSummary,
-      fetchData: improveSummaryWithAiFn,
-      data: improvedSummary,
-      error: improveSummaryError,
-    } = useFetch(improveSummaryWithAi);
-  
+  const {
+    loading: improvingSummary,
+    fetchData: improveSummaryWithAiFn,
+    data: improvedSummary,
+    error: improveSummaryError,
+  } = useFetch(improveSummaryWithAi);
 
-   useEffect(() => {
-      if (improvedSummary) {
-        setValue("summary", improvedSummary);
-        toast.success("Summary improved successfully");
-      }
-    }, [improvedSummary]);
-  
-    const handleSummaryImprove = async () => {
-      const summary = watch("summary");
-      if (!summary) {
-          toast.error("Please enter your professional summary first")
-          return;
-      }
-  
-      await improveSummaryWithAiFn({
-        current: summary
-      });
-  
-      if (improveSummaryError) {
-        console.log("Error improving summary with ai: ", improveSummaryError);
-        toast.error("Error while improving the summary!");
-      }
-    };
 
-  const handleResume = async (data:resumeSchemaType) => {
+  useEffect(() => {
+    if (improvedSummary) {
+      setValue("summary", improvedSummary);
+      toast.success("Summary improved successfully");
+    }
+  }, [improvedSummary]);
+
+  const handleSummaryImprove = async () => {
+    const summary = watch("summary");
+    if (!summary) {
+      toast.error("Please enter your professional summary first")
+      return;
+    }
+
+    await improveSummaryWithAiFn({
+      current: summary
+    });
+
+    if (improveSummaryError) {
+      console.log("Error improving summary with ai: ", improveSummaryError);
+      toast.error("Error while improving the summary!");
+    }
+  };
+
+  const handleResume = async (data: resumeSchemaType) => {
     try {
-      console.log("submitted data: ",data)
-      const res=await saveResumeFn(data)
-      console.log("response: ",res)
+      console.log("submitted data: ", data)
+      const res = await saveResumeFn(data)
+      console.log("response: ", res)
     } catch (error) {
-      console.log("error saving resume: ",error)
+      console.log("error saving resume: ", error)
     }
   }
 
-  useEffect(()=>{
-    if(savingResume){
+  useEffect(() => {
+    if (savingResume) {
       // toast.loading("Saving...")
-    }else if(saveResult){
+    } else if (saveResult) {
       toast.success("Saved!")
     }
-    if(saveError){
+    if (saveError) {
       toast.error(saveError)
     }
-  },[saveError,saveResult,savingResume])
+  }, [saveError, saveResult, savingResume])
 
   return (
     <div className='space-y-4'>
       <div className='flex flex-col md:flex-row justify-between items-center gap-2'>
         <h1 className='text-5xl font-bold gradient-title md:text-6xl'> Resume Builder</h1>
         {
-     <div className='space-x-2'>
+          <div className='space-x-2'>
             <Button variant={'destructive'} onClick={handleSubmit(handleResume)} disabled={savingResume}>
               {
                 savingResume ? (
@@ -236,24 +244,24 @@ useEffect(() => {
               }
 
             </Button>
-           {
-                 activeTab == "preview" && <Button disabled={isgeneratingPdf} onClick={generatePdf} >
-              {
-                isgeneratingPdf ? (
-                  <>
-                    <Loader2 className='h-4 w-4 animate-spin' />
-                    Generating PDF...
-                  </>
-                ) : (
-                  <>
-                    <Download className='h-4 w-4' />
-                    Download Pdf
-                  </>
-                )
-              }
+            {
+              activeTab == "preview" && <Button disabled={isgeneratingPdf} onClick={generatePdf} >
+                {
+                  isgeneratingPdf ? (
+                    <>
+                      <Loader2 className='h-4 w-4 animate-spin' />
+                      Generating PDF...
+                    </>
+                  ) : (
+                    <>
+                      <Download className='h-4 w-4' />
+                      Download Pdf
+                    </>
+                  )
+                }
 
-            </Button>
-           } 
+              </Button>
+            }
           </div>
         }
       </div>
@@ -367,24 +375,24 @@ useEffect(() => {
             </div>
             <div>
               <Button
-              type="button"
-              variant="ghost"
-              size="sm"
-              onClick={handleSummaryImprove}
-              disabled={improvingSummary || !watch("summary")}
-            >
-              {improvingSummary? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Improving...
-                </>
-              ) : (
-                <>
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Improve with AI
-                </>
-              )}
-            </Button>
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleSummaryImprove}
+                disabled={improvingSummary || !watch("summary")}
+              >
+                {improvingSummary ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Improving...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Improve with AI
+                  </>
+                )}
+              </Button>
             </div>
             <div>
               <h3 className='text-lg font-medium'>Skills</h3>
