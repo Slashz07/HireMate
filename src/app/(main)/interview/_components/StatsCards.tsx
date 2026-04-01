@@ -14,7 +14,7 @@ function StatsCards({assessments}:{assessments:Assessment[]}) {
     
    const latestAssessmentScore=()=>{
      if(!assessments?.length) return 0
-     return assessments[0].quizScore.toFixed(2)
+     return assessments[assessments.length-1].quizScore.toFixed(2)
    }
 
    const getTotalQuestionsAttempted=()=>{
