@@ -13,7 +13,7 @@ function StartJourneyToday() {
                 <p className='mx-auto max-w-[600px] text-primary-foreground/80 md:text-xl'>
                     Join thousands of professioinals who are advancing their careers with AI-powered guidance
                 </p>
-                <Link href={""}>
+                <Link href={"/dashBoard"}>
                     <Button size={'lg'} variant={'secondary'} className='h-11 mt-5 animate-bounce'>
                         Start Your Journey Today <ArrowRight className='ml-2 h-4 w-4'/>
                     </Button>
